@@ -1,20 +1,44 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <h1>Client Engine Demo</h1>
+    <Login v-if="status == 'LOGIN'"/>
+    <Lobby v-if="status == 'LOBBY'" />
+    <Game v-if="status == 'GAME'" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "./components/HelloWorld.vue";
+import { play, Event } from "@leancloud/play";
+import Login from "./components/Login.vue";
+import Lobby from "./components/Lobby.vue";
+import Game from "./components/Game.vue";
+import { errorHandler } from "./utils";
 
 @Component({
   components: {
-    HelloWorld
+    Login,
+    Lobby,
+    Game
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  status = "LOGIN";
+
+  mounted() {
+    play.on(Event.CONNECTED, () => {
+      this.status = "LOBBY";
+    });
+    play.on(Event.CONNECT_FAILED, errorHandler);
+    play.on(Event.ROOM_JOINED, () => {
+      this.status = "GAME";
+    });
+    play.on(Event.ROOM_JOIN_FAILED, errorHandler);
+    play.on(Event.ROOM_LEFT, () => {
+      this.status = "LOBBY";
+    });
+  }
+}
 </script>
 
 <style>
@@ -25,5 +49,10 @@ export default class App extends Vue {}
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  font-size: 32px;
+}
+button,
+input {
+  font-size: 32px;
 }
 </style>

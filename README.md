@@ -1,4 +1,4 @@
-# play-server-master-demo-webapp
+# client-engine-demo-webapp
 
 ## Project setup
 ```
