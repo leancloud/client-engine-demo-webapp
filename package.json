@@ -2,13 +2,19 @@
   "name": "client-engine-demo-webapp",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "10.x"
+  },
   "scripts": {
+    "start": "http-server dist -p $LEANCLOUD_APP_PORT",
+    "postinstall": "npm run build",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@leancloud/play": "^0.13.9",
+    "@leancloud/play": "^0.13.17",
+    "http-server": "^0.11.1",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0"
