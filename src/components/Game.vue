@@ -7,6 +7,7 @@
       请选择：
       <button v-on:click="choose(i)" v-for="i in [0,1,2]" v-bind:key="i">{{choices[i]}}</button>
     </div>
+    <div v-show="status === 'end'"><button v-on:click="leave()">离开房间</button></div>
     <hr>
     <details open>
       <summary>日志</summary>
@@ -66,7 +67,9 @@ export default class Game extends Vue {
     });
     play.on(Event.PLAYER_ROOM_LEFT, ({ leftPlayer }) => {
       // ignore Master Left event
-      if (leftPlayer.isMaster()) { return; }
+      if (leftPlayer.isMaster()) {
+        return;
+      }
       this.log(`${leftPlayer.userId} 离开了房间`, "Play");
     });
   }
@@ -108,6 +111,10 @@ export default class Game extends Vue {
         receiverGroup: ReceiverGroup.MasterClient
       }
     );
+  }
+
+  private leave() {
+    play.leaveRoom();
   }
 
   private log(log: string, scope = "Game") {
