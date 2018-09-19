@@ -5,4 +5,6 @@ export const APP_KEY = "IJ9du47XAcJXjVz3BFecR3WV";
 export const REGION = Region.NorthChina;
 
 export const CLIENT_ENGINE_SERVER =
-  process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://client-engine-dev.leanapp.cn";
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : "https://client-engine-server.leanapp.cn";
