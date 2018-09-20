@@ -18,16 +18,27 @@ export default class Lobby extends Vue {
   id = Date.now().toString();
 
   async match() {
-    const { roomName } = await (await fetch(`${CLIENT_ENGINE_SERVER}/match`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        playerId: play.userId
-      })
-    })).json();
-    return this.joinRoom(roomName);
+    try {
+      play.joinRandomRoom();
+      await listen(play, Event.ROOM_JOINED, Event.ROOM_JOIN_FAILED);
+    } catch (error) {
+      // ROOM_NOT_FOUND，意味着没有可以用的房间
+      if (error.code === 4301) {
+        const { roomName } = await (await fetch(
+          `${CLIENT_ENGINE_SERVER}/reservation`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              playerId: play.userId
+            })
+          }
+        )).json();
+        return this.joinRoom(roomName);
+      }
+    }
   }
 
   joinRoom(roomName: string) {
