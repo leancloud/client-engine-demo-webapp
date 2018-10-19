@@ -25,7 +25,6 @@ import {
   ReceiverGroup,
   CustomEventData
 } from "@leancloud/play";
-import { CLIENT_ENGINE_SERVER } from "../configs";
 
 @Component
 export default class Game extends Vue {

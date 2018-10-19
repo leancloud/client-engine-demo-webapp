@@ -8,7 +8,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { play, Event } from "@leancloud/play";
-import { CLIENT_ENGINE_SERVER } from "../configs";
+import { configs } from "../configs";
 import { listen } from "../utils";
 
 @Component
@@ -25,7 +25,7 @@ export default class Lobby extends Vue {
       // ROOM_NOT_FOUND，意味着没有可以用的房间
       if (error.code === 4301) {
         const { roomName } = await (await fetch(
-          `${CLIENT_ENGINE_SERVER}/reservation`,
+          `${configs.clientEngineServer}/reservation`,
           {
             method: "POST",
             headers: {
