@@ -40,8 +40,7 @@ export default class Game extends Vue {
 
   mounted() {
     // 加入 Room 并等待玩家加入，等待 masterClient 宣布游戏开始
-    // 这里在 UI 层展示为「正在匹配」的状态
-    this.log("正在匹配");
+    this.log("正在等待其他玩家");
     play.on(Event.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
       // 忽略所有不是 masterClient 发来的消息
       if (senderId !== play.room.masterId) return;

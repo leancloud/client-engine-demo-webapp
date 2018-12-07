@@ -1,7 +1,7 @@
 <template>
   <div>
-    <button v-on:click="match">快速匹配</button>
-    <!-- <button>与好友对战</button> -->
+    <button v-on:click="match">快速开始</button>
+    <button v-on:click="create">创建新游戏</button>
   </div>
 </template>
 
@@ -39,6 +39,22 @@ export default class Lobby extends Vue {
         return this.joinRoom(roomName);
       }
     }
+  }
+
+  async create() {
+    const { roomName } = await (await fetch(
+      `${configs.clientEngineServer}/game`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          playerId: play.userId
+        })
+      }
+    )).json();
+    return this.joinRoom(roomName);
   }
 
   joinRoom(roomName: string) {
