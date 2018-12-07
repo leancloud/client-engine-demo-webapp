@@ -1,16 +1,29 @@
-import { EventEmitter } from "@leancloud/play";
+import { EventEmitter as PlayEventEmitter, PlayEvent } from "@leancloud/play";
 
-export function listen<T, K extends keyof T>(
-  target: EventEmitter<T>,
-  resolveEvent: K,
-  rejectEvent: string
-) {
+export function listen<
+  T extends PlayEvent,
+  K extends keyof T,
+  L extends keyof T
+>(target: PlayEventEmitter<T>, resolveEvent: K, rejectEvent?: L) {
   return new Promise<T[K]>((resolve, reject) => {
-    if (resolveEvent) {
-      target.once(resolveEvent, resolve);
-    }
+    let rejectCallback: (error: T[L]) => any;
+    const resolveCallback = (payload: T[K]) => {
+      if (rejectEvent) {
+        target.off(rejectEvent, rejectCallback);
+      }
+      resolve(payload);
+    };
+    target.once(resolveEvent, resolveCallback);
     if (rejectEvent) {
-      target.once(rejectEvent, reject);
+      rejectCallback = error => {
+        target.off(resolveEvent, resolveCallback);
+        if (error instanceof Error) {
+          reject(error);
+        } else {
+          reject(new Error((error as any).detail || JSON.stringify(error)));
+        }
+      };
+      target.once(rejectEvent, rejectCallback);
     }
   });
 }
