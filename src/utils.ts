@@ -1,5 +1,11 @@
 import { EventEmitter as PlayEventEmitter, PlayEvent } from "@leancloud/play";
 
+class WrappedPlayError extends Error {
+  constructor(message: string, public code?: number) {
+    super(message);
+  }
+}
+
 export function listen<
   T extends PlayEvent,
   K extends keyof T,
@@ -20,7 +26,15 @@ export function listen<
         if (error instanceof Error) {
           reject(error);
         } else {
-          reject(new Error((error as any).detail || JSON.stringify(error)));
+          const {
+            detail,
+            code,
+          } = error as any;
+          const wrappedError = new WrappedPlayError(detail || JSON.stringify(error));
+          if (code) {
+            wrappedError.code = code;
+          }
+          reject(wrappedError);
         }
       };
       target.once(rejectEvent, rejectCallback);
