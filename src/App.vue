@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>Client Engine Demo</h1>
+    <h2>Client Engine Demo</h2>
     <Login v-if="status == 'LOGIN'"/>
     <Lobby v-if="status == 'LOBBY'" />
     <Game v-if="status == 'GAME'" />
@@ -54,5 +54,9 @@ export default class App extends Vue {
 button,
 input {
   font-size: 32px;
+}
+details,
+details input {
+  font-size: 60%;
 }
 </style>
