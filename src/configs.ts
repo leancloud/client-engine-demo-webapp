@@ -1,7 +1,3 @@
-import { Region } from "@leancloud/play";
-
-export const REGION = Region.NorthChina;
-
 const appId = "rYAutyUJKH6i6DfUN0bqVx2x";
 const appKey = "IJ9du47XAcJXjVz3BFecR3WV";
 

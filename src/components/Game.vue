@@ -19,7 +19,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import {
-  play,
+  Client,
   Event,
   Player,
   ReceiverGroup,
@@ -28,10 +28,13 @@ import {
 
 @Component
 export default class Game extends Vue {
+  @Prop() private client!: Client;
+  @Prop() private onRoomLeft!: () => any;
+
   status = "inited";
   logs: string[] = [];
   choices = ["✊", "✌️", "✋"];
-  userId = play.userId;
+  userId = this.client.userId;
   opponent = {
     actorId: -1,
     userId: ""
@@ -41,9 +44,9 @@ export default class Game extends Vue {
   mounted() {
     // 加入 Room 并等待玩家加入，等待 masterClient 宣布游戏开始
     this.log("正在等待其他玩家");
-    play.on(Event.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+    this.client.on(Event.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
       // 忽略所有不是 masterClient 发来的消息
-      if (senderId !== play.room.masterId) return;
+      if (senderId !== this.client.room.masterId) return;
       switch (eventId) {
         case "game-start":
           this.log("游戏开始");
@@ -60,12 +63,12 @@ export default class Game extends Vue {
         }
       }
     });
-    play.on(Event.PLAYER_ROOM_JOINED, ({ newPlayer }) => {
+    this.client.on(Event.PLAYER_ROOM_JOINED, ({ newPlayer }) => {
       this.log(`${newPlayer.userId} 加入了房间`, "Play");
     });
-    play.on(Event.PLAYER_ROOM_LEFT, ({ leftPlayer }) => {
+    this.client.on(Event.PLAYER_ROOM_LEFT, ({ leftPlayer }) => {
       // ignore Master Left event
-      if (leftPlayer.isMaster()) {
+      if (leftPlayer.isMaster) {
         return;
       }
       this.log(`${leftPlayer.userId} 离开了房间`, "Play");
@@ -73,8 +76,8 @@ export default class Game extends Vue {
   }
 
   private startGame() {
-    const { actorId, userId } = play.room.playerList.find(
-      player => !player.isMaster() && player !== play.player
+    const { actorId, userId } = this.client.room.playerList.find(
+      player => !player.isMaster && player !== this.client.player
     )!;
     this.opponent = {
       actorId,
@@ -100,7 +103,7 @@ export default class Game extends Vue {
   private choose(index: number) {
     this.log(`你选择了 ${this.choices[index]}`);
     this.status = "pending";
-    play.sendEvent(
+    this.client.sendEvent(
       "play",
       {
         index
@@ -112,7 +115,7 @@ export default class Game extends Vue {
   }
 
   private leave() {
-    play.leaveRoom();
+    this.client.leaveRoom().then(() => this.onRoomLeft());
   }
 
   private log(log: string, scope = "Game") {

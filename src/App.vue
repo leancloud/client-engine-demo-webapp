@@ -1,15 +1,15 @@
 <template>
   <div id="app">
     <h2>Client Engine Demo</h2>
-    <Login v-if="status == 'LOGIN'"/>
-    <Lobby v-if="status == 'LOBBY'" />
-    <Game v-if="status == 'GAME'" />
+    <Login v-if="status == 'LOGIN'" :on-login='onLogin'/>
+    <Lobby v-if="status == 'LOBBY'" :client='client' :on-room-joined='onRoomJoined' />
+    <Game v-if="status == 'GAME'" :client='client' :on-room-left='onRoomLeft'/>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { play, Event } from "@leancloud/play";
+import { Client, Event } from "@leancloud/play";
 import Login from "./components/Login.vue";
 import Lobby from "./components/Lobby.vue";
 import Game from "./components/Game.vue";
@@ -24,19 +24,17 @@ import { errorHandler } from "./utils";
 })
 export default class App extends Vue {
   status = "LOGIN";
+  client?: Client;
 
-  mounted() {
-    play.on(Event.CONNECTED, () => {
-      this.status = "LOBBY";
-    });
-    play.on(Event.CONNECT_FAILED, errorHandler);
-    play.on(Event.ROOM_JOINED, () => {
-      this.status = "GAME";
-    });
-    play.on(Event.ROOM_JOIN_FAILED, errorHandler);
-    play.on(Event.ROOM_LEFT, () => {
-      this.status = "LOBBY";
-    });
+  private onLogin(client: Client) {
+    this.client = client;
+    this.status = "LOBBY";
+  }
+  private onRoomJoined() {
+    this.status = "GAME";
+  }
+  private onRoomLeft() {
+    this.status = "LOBBY";
   }
 }
 </script>

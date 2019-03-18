@@ -26,11 +26,10 @@ export function listen<
         if (error instanceof Error) {
           reject(error);
         } else {
-          const {
-            detail,
-            code,
-          } = error as any;
-          const wrappedError = new WrappedPlayError(detail || JSON.stringify(error));
+          const { detail, code } = error as any;
+          const wrappedError = new WrappedPlayError(
+            detail || JSON.stringify(error)
+          );
           if (code) {
             wrappedError.code = code;
           }

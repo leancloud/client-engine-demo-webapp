@@ -21,24 +21,28 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { play, Event } from "@leancloud/play";
-import { listen } from "../utils";
-import { configs, REGION } from "../configs";
+import { Client, Event } from "@leancloud/play";
+import { errorHandler, listen } from "../utils";
+import { configs } from "../configs";
 
 @Component
 export default class Login extends Vue {
   id = Date.now().toString();
   configs = configs;
 
+  @Prop() private onLogin!: (client: Client) => any;
+
   login() {
-    play.init({
+    const client = new Client({
       appId: configs.appId,
       appKey: configs.appKey,
-      region: REGION
+      userId: this.id
     });
 
-    play.userId = this.id;
-    play.connect();
+    client
+      .connect()
+      .then(() => this.onLogin(client))
+      .catch(errorHandler);
   }
 }
 </script>

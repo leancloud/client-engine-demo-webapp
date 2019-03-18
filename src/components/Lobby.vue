@@ -7,13 +7,14 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { play, Event } from "@leancloud/play";
+import { Event, Client } from "@leancloud/play";
 import { configs } from "../configs";
-import { listen } from "../utils";
+import { errorHandler, listen } from "../utils";
 
 @Component
 export default class Lobby extends Vue {
-  @Prop() private onLogin!: () => any;
+  @Prop() private client!: Client;
+  @Prop() private onRoomJoined!: () => any;
 
   id = Date.now().toString();
 
@@ -26,11 +27,13 @@ export default class Lobby extends Vue {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          playerId: play.userId
+          playerId: this.client.userId
         })
       }
     )).json();
-    return this.joinRoom(roomName);
+    return this.joinRoom(roomName)
+      .then(() => this.onRoomJoined())
+      .catch(errorHandler);
   }
 
   async create() {
@@ -42,16 +45,17 @@ export default class Lobby extends Vue {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          playerId: play.userId
+          playerId: this.client.userId
         })
       }
     )).json();
-    return this.joinRoom(roomName);
+    return this.joinRoom(roomName)
+      .then(() => this.onRoomJoined())
+      .catch(errorHandler);
   }
 
   joinRoom(roomName: string) {
-    play.joinRoom(roomName);
-    return listen(play, Event.ROOM_JOINED, Event.ROOM_JOIN_FAILED);
+    return this.client.joinRoom(roomName);
   }
 }
 </script>
