@@ -26,6 +26,12 @@ import {
   CustomEventData
 } from "@leancloud/play";
 
+enum GameEvent {
+  Start = 10,
+  Play = 11,
+  Over = 20
+}
+
 @Component
 export default class Game extends Vue {
   @Prop() private client!: Client;
@@ -48,15 +54,15 @@ export default class Game extends Vue {
       // 忽略所有不是 masterClient 发来的消息
       if (senderId !== this.client.room.masterId) return;
       switch (eventId) {
-        case "game-start":
+        case GameEvent.Start:
           this.log("游戏开始");
           this.startGame();
           this.status = "waiting-for-choice";
           break;
-        case "play":
+        case GameEvent.Play:
           this.log(`对手已选择`);
           break;
-        case "game-over": {
+        case GameEvent.Over: {
           this.endGame(eventData);
           this.log("游戏结束");
           this.status = "end";
@@ -104,7 +110,7 @@ export default class Game extends Vue {
     this.log(`你选择了 ${this.choices[index]}`);
     this.status = "pending";
     this.client.sendEvent(
-      "play",
+      GameEvent.Play,
       {
         index
       },
