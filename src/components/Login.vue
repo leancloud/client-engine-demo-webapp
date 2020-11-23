@@ -8,6 +8,9 @@
       <label>APP_KEY:
         <input type="text" v-model="configs.appKey" required/>
       </label><br/>
+      <label>PLAY_SERVER:
+        <input type="text" v-model="configs.playServer" required/>
+      </label><br/>
       <label>Client Engine Server:
         <input type="text" v-model="configs.clientEngineServer" required/>
       </label><br/>
@@ -36,7 +39,8 @@ export default class Login extends Vue {
     const client = new Client({
       appId: configs.appId,
       appKey: configs.appKey,
-      userId: this.id
+      playServer: configs.playServer,
+      userId: this.id,
     });
 
     client
